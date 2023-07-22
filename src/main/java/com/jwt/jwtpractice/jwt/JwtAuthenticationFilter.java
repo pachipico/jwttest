@@ -2,6 +2,7 @@ package com.jwt.jwtpractice.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jwt.jwtpractice.user.Member;
+import com.jwt.jwtpractice.user.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -9,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -24,6 +26,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private final AuthenticationManager authenticationManager;
 
     private final JwtUtil jwtUtil;
+
+    private final MemberRepository memberRepository;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -47,6 +51,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String refreshToken = jwtUtil.createRefreshToken(details);
         response.addHeader("accessToken", accessToken);
         response.addHeader("refreshToken", refreshToken);
+        memberRepository.updateToken(refreshToken);
         response.getOutputStream().println("authentication success");
     }
 }

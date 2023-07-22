@@ -44,7 +44,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().permitAll()
                 .and()
                 .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtUtil))
-                .addFilter(new JwtAuthorizationFilter(authenticationManager(), memberRepository, jwtUtil))
+                .addFilter(new JwtAuthorizationFilter(authenticationManager(), memberRepository, jwtUtil, memberRepository))
 
         ;
     }

@@ -24,7 +24,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     private AuthenticationManager authenticationManager;
     private JwtUtil jwtUtil;
 
-    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, MemberRepository memberRepository, JwtUtil jwtUtil) {
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, MemberRepository memberRepository, JwtUtil jwtUtil, MemberRepository repository) {
 
         super(authenticationManager);
         this.memberRepository = memberRepository;
@@ -40,6 +40,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         if (accessToken == null || refreshToken == null) super.doFilterInternal(request, response, chain);
         else {
             // todo access 검증 시 유효하지 않으면 -> refresh 토큰 검증하는 로직 구현해야함
+            // access 토큰, refresh 토큰 검증로직이 달라야함.(access 토큰은 파싱한 id 값으로 db에서 가져와 검증, refresh 토큰은 db에 있는 refresh 토큰과 직접 비교)
             // access 토큰이 유효한지 먼저 확인
             isTokenValid(accessToken);
 
