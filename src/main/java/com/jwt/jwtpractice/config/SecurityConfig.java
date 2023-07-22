@@ -27,7 +27,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final CorsFilter corsFilter;
 
     private final JwtUtil jwtUtil;
+
     private final MemberRepository memberRepository;
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -43,8 +45,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/member/admin").hasAuthority("ADMIN")
                 .anyRequest().permitAll()
                 .and()
-                .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtUtil))
-                .addFilter(new JwtAuthorizationFilter(authenticationManager(), memberRepository, jwtUtil, memberRepository))
+                .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtUtil, memberRepository))
+                .addFilter(new JwtAuthorizationFilter(authenticationManager(), memberRepository, jwtUtil))
 
         ;
     }

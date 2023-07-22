@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Data
 @Getter
@@ -20,6 +21,7 @@ public class MemberDetails implements UserDetails {
     public MemberDetails(Member member) {
         this.member = member;
     }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

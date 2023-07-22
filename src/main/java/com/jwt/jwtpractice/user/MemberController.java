@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @RestController
@@ -46,13 +48,15 @@ public class MemberController {
     }
 
     @GetMapping("reissue")
-    public String reissue(@RequestBody String refreshToken) {
+    public String reissue(HttpServletRequest request, HttpServletResponse response) {
         // 1. refreshToken 으로 member_info 확인 후 있으면 가져옴
-        Member member = repository.findByToken(refreshToken);
+        Member member = repository.findByToken(request.getHeader("refreshToken"));
         if (member == null) throw new RuntimeException("토큰이 틀렸는데용");
 
 
         // 2. 같다면 accessToken 재발행 후 전송
-        return jwtUtil.createAccessToken(new MemberDetails(member));
+        String accessToken = jwtUtil.createAccessToken(new MemberDetails(member));
+        response.addHeader("accessToken", accessToken);
+        return "재발행해드렸어요";
     }
 }

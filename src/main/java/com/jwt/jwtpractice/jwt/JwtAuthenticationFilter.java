@@ -19,15 +19,22 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-@RequiredArgsConstructor
+
 @Slf4j
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    private final AuthenticationManager authenticationManager;
+    private AuthenticationManager authenticationManager;
 
-    private final JwtUtil jwtUtil;
+    private JwtUtil jwtUtil;
 
-    private final MemberRepository memberRepository;
+    private MemberRepository memberRepository;
+
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, JwtUtil jwtUtil, MemberRepository memberRepository) {
+        this.authenticationManager = authenticationManager;
+        this.jwtUtil = jwtUtil;
+        this.memberRepository = memberRepository;
+    }
+
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -51,7 +58,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String refreshToken = jwtUtil.createRefreshToken(details);
         response.addHeader("accessToken", accessToken);
         response.addHeader("refreshToken", refreshToken);
-        memberRepository.updateToken(refreshToken);
+        memberRepository.save(details.getMember());
         response.getOutputStream().println("authentication success");
     }
 }
