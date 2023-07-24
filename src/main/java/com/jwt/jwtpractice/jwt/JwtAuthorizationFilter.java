@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.jwt.jwtpractice.user.Member;
 import com.jwt.jwtpractice.user.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -40,12 +41,13 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         log.info("인증로직 시작");
         String accessToken = request.getHeader("accessToken");
 
+
         // 토큰이 없으면 넘어가기(403)
-        if (accessToken == null ) super.doFilterInternal(request, response, chain);
+        if (accessToken == null || accessToken.isEmpty() ) super.doFilterInternal(request, response, chain);
         else {
             // todo access 검증 시 유효하지 않으면 -> refresh 토큰 검증하는 로직 구현해야함
-
             MemberDetails memberDetails = jwtUtil.checkAccessToken(accessToken);
+            if (memberDetails == null) throw new AuthorizationServiceException("토큰을 재발행해 주세여");
             SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(memberDetails, null, memberDetails.getAuthorities()));
         }
 

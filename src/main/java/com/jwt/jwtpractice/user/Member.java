@@ -1,6 +1,7 @@
 package com.jwt.jwtpractice.user;
 
 import lombok.Data;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 
 
@@ -19,6 +20,7 @@ public class Member {
     @Id
     private String memberId;
 
+    @Nullable
     private String name;
 
     private String token;

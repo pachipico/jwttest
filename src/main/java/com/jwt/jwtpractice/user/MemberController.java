@@ -4,6 +4,7 @@ import com.jwt.jwtpractice.jwt.JwtUtil;
 import com.jwt.jwtpractice.jwt.MemberDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,13 +51,21 @@ public class MemberController {
     @GetMapping("reissue")
     public String reissue(HttpServletRequest request, HttpServletResponse response) {
         // 1. refreshToken 으로 member_info 확인 후 있으면 가져옴
-        Member member = repository.findByToken(request.getHeader("refreshToken"));
-        if (member == null) throw new RuntimeException("토큰이 틀렸는데용");
-
-
+        MemberDetails memberDetails = jwtUtil.checkRefreshToken(request.getHeader("refreshToken"));
+        if (memberDetails == null) throw new AuthorizationServiceException("토큰이 틀렸는데용");
         // 2. 같다면 accessToken 재발행 후 전송
-        String accessToken = jwtUtil.createAccessToken(new MemberDetails(member));
+        String accessToken = jwtUtil.createAccessToken(memberDetails);
         response.addHeader("accessToken", accessToken);
         return "재발행해드렸어요";
+    }
+
+
+    @PostMapping("logout")
+    public void logout(@RequestBody Member member) {
+        log.info("??? {}", member);
+        Member byMemberId = repository.findByMemberId(member.getMemberId());
+        log.info("member : {}", byMemberId);
+        byMemberId.setToken("");
+        repository.save(byMemberId);
     }
 }

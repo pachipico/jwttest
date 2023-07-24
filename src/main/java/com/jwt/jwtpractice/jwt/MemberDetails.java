@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.persistence.ManyToOne;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
 @Setter
 public class MemberDetails implements UserDetails {
 
+    @ManyToOne
     private Member member;
 
     public MemberDetails(Member member) {

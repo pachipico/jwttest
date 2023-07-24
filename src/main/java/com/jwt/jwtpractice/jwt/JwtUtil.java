@@ -2,19 +2,13 @@ package com.jwt.jwtpractice.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.Claim;
 import com.jwt.jwtpractice.user.Member;
 import com.jwt.jwtpractice.user.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import java.security.Principal;
-import java.time.Instant;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -59,6 +53,8 @@ public class JwtUtil {
     /* 3. access token 검증 */
     public MemberDetails checkAccessToken(String accessToken) {
         /* 1. 받은 토큰 유효 시간 확인 */
+        Date expiresAt = JWT.decode(accessToken).getExpiresAt();
+        log.info("this token expire at : {} - it's {} now, so it is {}", expiresAt, new Date(), isExpired(accessToken) ? "expired" : "not expired");
         if (isExpired(accessToken)) return null;
         String memberId = JWT.require(Algorithm.HMAC256("aaa")).build().verify(accessToken).getClaim("memberId").toString().replaceAll("\"", "");
         if (memberId == null) return null;
@@ -72,13 +68,14 @@ public class JwtUtil {
 
     /* 4. refresh token 검증 */
     public MemberDetails checkRefreshToken(String refreshToken) {
-        if (isExpired(refreshToken)) return null;
+        if (refreshToken.isEmpty() || isExpired(refreshToken)) return null;
         Member member = memberRepository.findByToken(refreshToken);
         return new MemberDetails(member);
     }
 
     public boolean isExpired(String token) {
-        return JWT.decode(token).getExpiresAt().before(new Date());
+
+        return JWT.decode(token).getExpiresAt().toInstant().isBefore(new Date().toInstant());
     }
 
 
